@@ -11,7 +11,7 @@ creating, and subsequently removing, TXT records using the Websupport Remote API
 Installation
 ------------
 
-    pip install certbot-dns-websupportsk
+    pip3 install certbot-dns-websupportsk
 
 ---   
  
@@ -25,10 +25,7 @@ certbot's command line:
 | -------------------------------------------------------------------------------------- | ------------------------------------------- |
 | ``--authenticator dns-websupportsk``                          | select the authenticator plugin (Required)  |
 | ``--dns-websupportsk-credentials "/path/to/credentials.ini"`` | websupport Remote User INI file. (Required) |
-| ``--dns-websupportsk-propagation-seconds "600"``               | waiting time  for DNS to propagate before the ACMEserver to verify the DNS (Default: 60, Recommended: >= 600) |
-
-(Note that the verbose and seemingly redundant ``certbot-dns-websupportsk:`` prefix
-is currently imposed by certbot for external plugins.)
+| ``--dns-websupportsk-propagation-seconds "600"``                  | waiting time  for DNS to propagate before the ACMEserver to verify the DNS (Default: 60, Recommended: >= 600) |
 
 ---
 
