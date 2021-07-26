@@ -1,4 +1,4 @@
-certbot-dns-websupport
+certbot-dns-websupportsk
 ======================
 
 Websupport DNS Authenticator plugin for Certbot
@@ -6,43 +6,45 @@ Websupport DNS Authenticator plugin for Certbot
 This plugin automates the process of completing a ``dns-01`` challenge by
 creating, and subsequently removing, TXT records using the Websupport Remote API.
 
+---
 
 Installation
 ------------
 
-    pip install certbot-dns-websupport
-    
-    
+    pip install certbot-dns-websupportsk
+
+---   
+ 
 Named Arguments
 ---------------
 
-To start using DNS authentication for Websupport, pass the following arguments on
+To start using DNS authentication for [Websupport.sk](https://www.websupport.sk), pass the following arguments on
 certbot's command line:
-| Syntax | test |
 
+|   Command                                                                              | Description                                 |
+| -------------------------------------------------------------------------------------- | ------------------------------------------- |
+| ``--authenticator certbot-dns-websupportsk:dns-websupportsk``                          | select the authenticator plugin (Required)  |
+| ``--certbot-dns-websupportsk:dns-websupportsk-credentials "/path/to/credentials.ini"`` | websupport Remote User INI file. (Required) |
+| ``--certbot-dns-websupportsk:dns-websupportsk-propagation-seconds "600"``               | waiting time  for DNS to propagate before the ACMEserver to verify the DNS (Default: 120, Recommended: >= 600) |
 
-|   Command      | Description |
-| ----------- | ----------- |
-|  ``--authenticator certbot-dns-websupport:dns-websupport``| select the authenticator plugin (Required) |
-|``--certbot-dns-websupport:dns-websupport-credentials``    | websupport Remote User INI file. (Required) |
-| ``--certbot-dns-websupport:dns-websupport-propagation-seconds`` | waiting time  for DNS to propagate before the ACME server to verify the DNS (Default: 120, Recommended: >= 600) |
-
-(Note that the verbose and seemingly redundant ``certbot-dns-websupport:`` prefix
+(Note that the verbose and seemingly redundant ``certbot-dns-websupportsk:`` prefix
 is currently imposed by certbot for external plugins.)
 
+---
 
-Credentials
------------
+Credentials file
+----------------
 
 An example ``credentials.ini`` file:
 
 ```ini
-certbot_dns_websupport:dns_websupport_api_key = <api_key>
-certbot_dns_websupport:dns_websupport_secret = <secret>
-certbot_dns_websupport:dns_websupport_domain = example.com
+certbot_dns_websupportsk:dns_websupportsk_api_key = <api_key>
+certbot_dns_websupportsk:dns_websupportsk_secret = <secret>
+certbot_dns_websupportsk:dns_websupportsk_domain = example.com
 ```
+
 The path to this file can be provided interactively or using the
-``--certbot-dns-websupport:dns-websupport-credentials`` command-line argument. Certbot
+``--certbot-dns-websupportsk:dns-websupportsk-credentials`` command-line argument. Certbot
 records the path to this file for use during renewal, but does not store the
 file's contents.
 
@@ -60,24 +62,28 @@ file. This warning will be emitted each time Certbot uses the credentials file,
 including for renewal, and cannot be silenced except by addressing the issue
 (e.g., by using a command like ``chmod 600`` to restrict access to the file).
 
+---
 
-Examples
---------
+Direct command
+--------------
 
 To acquire a single certificate for both ``example.com`` and
-``*.example.com``, waiting 900 seconds for DNS propagation:
+``*.example.com``, waiting 600 seconds for DNS propagation:
 
 
 ```bash
 certbot certonly \
-    --authenticator certbot-dns-websupport:dns-websupport \
-    --certbot-dns-websupport:dns-websupport-credentials /etc/letsencrypt/.secrets/domain.tld.ini \
-    --certbot-dns-websupport:dns-websupport-propagation-seconds 900 \
+    --authenticator certbot-dns-websupportsk:dns-websupportsk \
+    --certbot-dns-websupportsk:dns-websupportsk-propagation-seconds "600" \
+    --certbot-dns-websupportsk:dns-websupportsk-credentials "/etc/letsencrypt/.secrets/<domain>.<tld>.ini" \
+    --email full.name@example.com \
     --agree-tos \
     --rsa-key-size 4096 \
-    -d 'example.com' \
-    -d '*.example.com'
+    -d *.example.com -d example.com
 ```
+**NOTE:** Don't forget to name your ini file
+
+---
 
 Docker
 ------
@@ -85,32 +91,43 @@ Docker
 In order to create a docker container with a certbot-dns-websupport installation,
 create an empty directory with the following ``Dockerfile``:
 
-```docker
+```dockerfile
 FROM certbot/certbot
-RUN pip install certbot-dns-websupport
-```
-Proceed to build the image::
-
-    docker build -t certbot/dns-websupport .
-
-Once that's finished, the application can be run as follows::
-
-```docker
-docker run --rm \
-   -v /var/lib/letsencrypt:/var/lib/letsencrypt \
-   -v /etc/letsencrypt:/etc/letsencrypt \
-   --cap-drop=all \
-   certbot/dns-websupport certonly \
-   --authenticator certbot-dns-websupport:dns-websupport \
-   --certbot-dns-websupport:dns-websupport-propagation-seconds 900 \
-   --certbot-dns-websupport:dns-websupport-credentials \
-       /etc/letsencrypt/.secrets/domain.tld.ini \
-   --no-self-upgrade \
-   --keep-until-expiring --non-interactive --expand \
-   --server https://acme-v02.api.letsencrypt.org/directory \
-   -d example.com -d '*.example.com'
+RUN pip3 install certbot-dns-websupportsk
 ```
 
-It is suggested to secure the folder as follows::
+<br>
+
+Proceed to build the image:
+```commandline
+docker build -t certbot/dns-websupportsk .
+```
+
+<br>
+
+Once that's finished, the application can be run as follows:
+```commandline
+sudo docker run -it --rm \
+    -v /var/lib/letsencrypt:/var/lib/letsencrypt \
+    -v /etc/letsencrypt:/etc/letsencrypt \
+    crypsde/dns-websupport \
+    certonly \
+    --authenticator certbot-dns-websupportsk:dns-websupportsk \
+    --certbot-dns-websupportsk:dns-websupportsk-propagation-seconds "600" \
+    --certbot-dns-websupportsk:dns-websupportsk-credentials "/etc/letsencrypt/.secrets/<domain>.<tld>.ini" \
+    --email full.name@example.com \
+    --agree-tos \
+    --rsa-key-size 4096 \
+    -d *.example.com -d example.com
+```
+**NOTE:** Check if your volumes on host system match this example (Depends if you installed your server on host system or inside docker). If not, you will have to edit this command.
+
+<br>
+
+It is suggested to secure the .ini folder as follows:
+```commandline
 chown root:root /etc/letsencrypt/.secrets
 chmod 600 /etc/letsencrypt/.secrets
+```
+
+---

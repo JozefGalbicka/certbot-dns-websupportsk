@@ -135,23 +135,21 @@ class WebsupportAPI:
         print(self.s.put(f"{self.api}{self.default_path}/zone/{self.domain}/record/{id_}", json=kwargs))
 
     def delete_record(self, id_):
-        print(f"Deleting record: id:{id_}, end="    ")
+        print(f"Deleting record: id:{id_}", end="    ")
         print(self.s.delete(f"{self.api}{self.default_path}/zone/{self.domain}/record/{id_}"))
 
+    # return first record found
     # TO-DO: add error handling for not found record and multiple records found
     def get_record_id(self, type_, name, **kwargs):
         record = self.get_records(type_=type_, name=name, **kwargs)
-        return record[0]['id'] if len(record) == 1 and type(record) == list else None
+        return record[0]['id']
+        # return record[0]['id'] if len(record) == 1 and type(record) == list else None
 
-    def handle_wildcard_auth(self, subdomain, validation_token):
-        id_ = self.get_record_id(type_="TXT", name=subdomain)
+    def handle_wildcard_auth(self, domain_name, validation_token):
+        subdomain = domain_name.split(".")[0]
+        self.create_record(type_="TXT", name=subdomain, content=validation_token)
 
-        if not id_:
-            self.create_record(type_="TXT", name=subdomain, content=validation_token)
-        else:
-            self.edit_record(id_=id_, content=validation_token)
-
-    def clean_wildcard_auth(self, subdomain):
+    def clean_wildcard_auth(self, domain_name):
+        subdomain = domain_name.split(".")[0]
         id_ = self.get_record_id("TXT", subdomain)
         self.delete_record(id_)
-
