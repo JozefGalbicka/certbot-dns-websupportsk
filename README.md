@@ -110,7 +110,7 @@ Once that's finished, the application can be run as follows:
 sudo docker run -it --rm \
     -v /var/lib/letsencrypt:/var/lib/letsencrypt \
     -v /etc/letsencrypt:/etc/letsencrypt \
-    crypsde/dns-websupport \
+    certbot/dns-websupportsk \
     certonly \
     --authenticator certbot-dns-websupportsk:dns-websupportsk \
     --certbot-dns-websupportsk:dns-websupportsk-propagation-seconds "600" \
