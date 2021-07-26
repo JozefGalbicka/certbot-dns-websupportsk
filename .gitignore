@@ -1,5 +1,5 @@
 .idea/
 venv/
 *.pyc
-certbot_dns_websupport.egg-info/ 
+certbot_dns_websupportsk.egg-info/
 dist/ 

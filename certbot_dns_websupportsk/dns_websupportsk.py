@@ -99,7 +99,7 @@ class WebsupportAPI:
         self.s = requests.Session()
         self.s.auth = (api_key, signature)
         self.s.headers.update(headers)
-        print(self.s.get("%s%s%s" % (self.api, self.default_path, self.query)).content)
+        login_response = self.s.get("%s%s%s" % (self.api, self.default_path, self.query)).content
 
     def get_records(self, type_=None, id_=None, name=None, content=None, ttl=None, note=None):
         # create dict of arguments passed, filter out 'None' values and 'self' argument, rename keys(remove "_"
@@ -108,6 +108,7 @@ class WebsupportAPI:
         # get data from api
         data = json.loads(self.s.get(f"{self.api}{self.default_path}/zone/{self.domain}/record{self.query}").content)
         items = data["items"]
+        print(f"Getting records, arguments: {args},... found: {len(items)} item(s)")
 
         records = list()
         for item in items:
@@ -126,12 +127,15 @@ class WebsupportAPI:
         args.pop('self')
         args.pop('kwargs')
         args.update(**kwargs)
+        print(f"Creating record: type:{type_}, name:{name}, content:{content}", end="    ")
         print(self.s.post(f"{self.api}{self.default_path}/zone/{self.domain}/record", json=args))
 
     def edit_record(self, id_, **kwargs):
+        print(f"Editing record: id:{id_}, kwargs:{kwargs}", end="    ")
         print(self.s.put(f"{self.api}{self.default_path}/zone/{self.domain}/record/{id_}", json=kwargs))
 
     def delete_record(self, id_):
+        print(f"Deleting record: id:{id_}, end="    ")
         print(self.s.delete(f"{self.api}{self.default_path}/zone/{self.domain}/record/{id_}"))
 
     # TO-DO: add error handling for not found record and multiple records found
