@@ -37,7 +37,7 @@ class Authenticator(dns_common.DNSAuthenticator):
     @classmethod
     def add_parser_arguments(cls, add, **kwargs):  # pylint: disable=arguments-differ
         super(Authenticator, cls).add_parser_arguments(
-            add, default_propagation_seconds=120
+            add, default_propagation_seconds=60
         )
         add("credentials", help="Websupport credentials INI file.")
 
@@ -108,7 +108,6 @@ class WebsupportAPI:
         # get data from api
         data = json.loads(self.s.get(f"{self.api}{self.default_path}/zone/{self.domain}/record{self.query}").content)
         items = data["items"]
-        print(f"Getting records, arguments: {args},... found: {len(items)} item(s)")
 
         records = list()
         for item in items:
@@ -118,6 +117,7 @@ class WebsupportAPI:
             # record is valid only if all values from args match
             records.append(item) if len(intersection_dict) == len(args) else None
 
+        print(f"Getting records, arguments: {args},... found: {len(records)} record(s)")
         return records
 
     def create_record(self, type_, name, content, ttl=600, **kwargs):
@@ -146,10 +146,12 @@ class WebsupportAPI:
         # return record[0]['id'] if len(record) == 1 and type(record) == list else None
 
     def handle_wildcard_auth(self, domain_name, validation_token):
-        subdomain = domain_name.split(".")[0]
+        print(f"Certbot passed domain name: {domain_name}")
+        subdomain = domain_name.replace(f".{self.domain}", "")
+
         self.create_record(type_="TXT", name=subdomain, content=validation_token)
 
     def clean_wildcard_auth(self, domain_name):
-        subdomain = domain_name.split(".")[0]
+        subdomain = domain_name.replace(f".{self.domain}", "")
         id_ = self.get_record_id("TXT", subdomain)
         self.delete_record(id_)
